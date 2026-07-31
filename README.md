@@ -30,6 +30,5 @@
 ## Запуск проекта
 
 ```bash
-# Сборка и запуск Docker контейнера
 docker build -t recsys-app .
 docker run -p 8000:8000 recsys-app
