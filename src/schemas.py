@@ -34,3 +34,11 @@ class MoviesFilterRequest(BaseModel):
     page_size: int = Field(default=10, ge=1, le=100)
 
 
+class UserProfileResponse(BaseModel):
+    user_id: int
+    gender: str
+    age_group: str
+    occupation_id: int
+    total_ratings: int
+    avg_rating: float
+    favorite_genres: List[str]

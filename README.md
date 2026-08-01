@@ -1,6 +1,8 @@
 # Two-Stage Production Recommender System (MovieLens-1M)
 
-Архитектура двухуровневой рекомендательной системы (Retrieval + Reranking)
+Пет-проект двухэтапной рекомендательной системы (Retrieval + Reranking) на датасете MovieLens-1M. 
+
+Основная идея не прогонять весь каталог фильмов через градиентный бустинг, а сначала быстро отобрать кандидатов через матричную факторизацию и отранжировать их с CatBoost с учетом фичей.
 
 ## Архитектура проекта
 
@@ -26,6 +28,10 @@
 * `item_rating_count`: 47.80%
 * `user_rating_count`: 28.45%
 * `als_sim` (ALS Embedding Cosine Similarity): 23.75%
+
+## Обучение
+```bash
+python train.py
 
 ## Запуск проекта
 

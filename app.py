@@ -23,6 +23,19 @@ def load_movies_metadata():
         return movies.set_index("movie_id").to_dict(orient="index")
     return {}
 
+def load_users_metadata():
+    users_path = "data/raw/ml-1m/users.dat"
+    if os.path.exists(users_path):
+        users = pd.read_csv(
+            users_path,
+            sep="::",
+            engine="python",
+            names=["user_id", "gender", "age", "occupation", "zip_code"],
+            encoding="latin-1"
+        )
+        return users.set_index("user_id").to_dict(orient="index")
+    return {}
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     model_path = "catboost_reranker.cbm"
@@ -35,6 +48,7 @@ async def lifespan(app: FastAPI):
             print(f"Error loading model: {e}")
             
     app.state.artifacts["movies"] = load_movies_metadata()
+    app.state.artifacts["users"] = load_users_metadata()
     yield
     app.state.artifacts.clear()
 
