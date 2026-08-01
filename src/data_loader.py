@@ -13,10 +13,8 @@ class MovieLensDataLoader:
     def __init__(self, data_dir: str = "data"):
         self.data_dir = data_dir
         self.raw_dir = os.path.join(data_dir, "raw")
-        self.processed_dir = os.path.join(data_dir, "processed")
 
         os.makedirs(self.raw_dir, exist_ok = True)
-        os.makedirs(self.processed_dir, exist_ok = True)
 
     def download_and_extract(self):
         zip_path = os.path.join(self.raw_dir, "ml-1m.zip")

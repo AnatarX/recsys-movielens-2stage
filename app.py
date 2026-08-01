@@ -1,4 +1,5 @@
 from contextlib import asynccontextmanager
+import os
 from fastapi import FastAPI, Query, HTTPException
 import pandas as pd
 import numpy as np
@@ -7,17 +8,32 @@ import time
 
 artifacts = {}
 
+
+def load_movies_metadata():
+    movies_path = "data/raw/ml-1m/movies.dat"
+    if os.path.exists(movies_path):
+        movies = pd.read_csv(
+            movies_path,
+            sep="::",
+            engine="python",
+            names=["movie_id", "title", "genres"],
+            encoding="latin-1"
+        )
+        return movies.set_index("movie_id").to_dict(orient="index")
+    return {}
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    print("Loading CatBoost...")
-    try:
-        model = CatBoostClassifier()
-        model.load_model("catboost_reranker.cbm")
-        artifacts["model"] = model
-        print("CatBoost succesful")
-    except Exception as e:
-        print(f"⚠️ Error model: {e}. Using fallback.")
-    
+    model_path = "catboost_reranker.cbm"
+    if os.path.exists(model_path):
+        try:
+            model = CatBoostClassifier()
+            model.load_model(model_path)
+            artifacts["model"] = model
+        except Exception as e:
+            print(f"Error loading model: {e}")
+            
+    artifacts["movies"] = load_movies_metadata()
     yield
     artifacts.clear()
 
@@ -60,10 +76,18 @@ def get_recommendations(
     
     scores = model.predict_proba(X)[:, 1]
     
+    movies_db = artifacts.get("movies", {})
     results = []
+    
     for m_id, score in zip(candidate_ids, scores):
+        m_info = movies_db.get(m_id, {})
+        raw_genres = m_info.get("genres", "Unknown")
+        genres_list = raw_genres.split("|") if raw_genres != "Unknown" else []
+
         results.append({
             "movie_id": int(m_id),
+            "title": m_info.get("title", f"Unknown Movie #{m_id}"),
+            "genres": genres_list,
             "score": round(float(score), 4)
         })
         

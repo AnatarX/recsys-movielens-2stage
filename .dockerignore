@@ -1,6 +1,11 @@
 .venv
-data/
+
 __pycache__
 .git
 .gitignore
 *.pyc
+
+
+data/processed/
+data/raw/ml-1m/ratings.dat
+data/raw/ml-1m/users.dat
